@@ -1,3 +1,3 @@
 ﻿  mine1.c
-C:\Users\user\Desktop\MineGame\MineGame\mine1.c(28,8): warning C4244: '함수': 'time_t'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\Users\user\Desktop\MineGame\MineGame\mine1.c(74,3): error C2143: 구문 오류: ';'이(가) '}' 앞에 없습니다.
+C:\Users\Administrator\Desktop\새 폴더\mine\MineGame\MineGame\mine1.c(29,8): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+  MineGame.vcxproj -> C:\Users\Administrator\Desktop\새 폴더\mine\MineGame\x64\Debug\MineGame.exe

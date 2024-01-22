@@ -4,8 +4,8 @@
 #include <time.h>
 #include <Windows.h>
 
-#define Max_x 11 // 가로 10
-#define Max_y 11  // 세로 10
+#define Max_x 16 // 가로 10
+#define Max_y 16  // 세로 10
 #define UP 72
 #define LEFT 75
 #define RIGHT 77
@@ -21,32 +21,32 @@ void GotoXY(int x, int y)
 
 }
 
-int map[Max_x][Max_y] = { 0, }; // 2차원 배열 사용 
+int map[Max_y][Max_x] = { 0, }; // 2차원 배열 사용
+char* openmap[Max_y][Max_x] = { NULL, };
 
 void CreateMine()
 {
 	srand(time(NULL));
-	int mine  = rand();
+	int object  = rand();
 	
-	int cnt = 0;
 	
 	for (int i = 0; i < Max_x; i++)
 	{
+		object = rand()%2;
+
 		for (int j = 0; j < Max_y; j++)
 		{	
-			if (i == 0 || i == 10)
+			if (i == 0 || i == Max_x-1)
 			{
 				map[i][j] = j;
 			}
-			else if (j == 0 || j == 10)
+			else if (j == 0 || j == Max_y-1)
 			{
 				map[i][j] = i;
 			}
 			else
 			{
-				mine = rand() % 2;
-				map[i][j] = mine;
-				
+				map[i][j] = object;
 			}
 		}
 		printf("\n");
@@ -61,29 +61,93 @@ void  HideMap()
 	{
 		for (int j = 0; j < Max_y; j++)
 		{
-			
-			if (map[i][j]==0||map[i][j]==1)
+			if (i == 0 || i == Max_x-1)
 			{
-				if (i != 0 || i != 10)
+				if (j >= 10)
 				{
-					printf(" □ ");
+					printf(" %d ", map[i][j]);
+				}
+				else
+				{
+					printf(" %d  ", map[i][j]); 
 				}
 			}
-			else 
+			else if (j == 0 || j == Max_y-1)
+			{
+				if (i >= 10)
+				{
+					printf(" %d ", map[i][j]);
+				}
+				else
+				{
+					printf(" %d  ", map[i][j]);
+				}
+				
+			}
+
+			else
+			{
+				printf(" □ ");
+			}
+			
+
 			
 		}
-		printf("\n");
+		printf("\n\n");
 	}
 
-
-
 }
+void CountMine()
+{
+	
+	for (int x = 0; x < Max_x; x++)
+	{
+		int mine_cnt = 0;
+
+		for (int y = 0; y < Max_y; y++)
+		{
+			if (map[y][x]==0 && y-1>0)
+			{
+				if ((x - 1) > 0 && map[y+1][x - 1] == 1) mine_cnt++; //1
+				if ((x - 1) > 0 && map[y][x - 1] == 1)mine_cnt++;//2
+				if ((x - 1) > 0 && map[y - 1][x - 1] == 1)mine_cnt++;//3
+				if ((y - 1) > 0 && map[y - 1][x] == 1)mine_cnt++;//4
+				if ( (y - 1) > 0 && map[y - 1][x + 1] == 1)mine_cnt++;//5
+				if ((y - 1) > 0 && map[y - 1][x] == 1)mine_cnt++;//6
+				if (map[y + 1][x + 1] == 1)mine_cnt++;//7
+				if (map[y][x + 1] == 1)mine_cnt++; //8 
+
+				
+			}
+		
+			map[y][x] = mine_cnt;
+			printf(" %d ", map[y][x]);
+
+		}
+		printf("\n");
+		
+		
+	}
+	
+		
+}
+
+
+
 
 
 int main()
 { 
+	
 	CreateMine();
-	HideMap();
+	CountMine();
+	
+	while (1)
+	{
+		
+	}
+
+		
 	
 	return 0;
 }

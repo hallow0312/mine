@@ -2,152 +2,171 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <Windows.h>
+#include <memory.h>
+#include <windows.h>
 
 #define Max_x 16 // 가로 10
-#define Max_y 16  // 세로 10
-#define UP 72
-#define LEFT 75
-#define RIGHT 77
-#define DOWN 80
+#define Max_y 16 // 세로 10
+#define MineCount 40 
 
-void GotoXY(int x, int y)
+void CreateMineTable(char map[][Max_x] ,char checkmap[Max_y][Max_x])
 {
-	// x , y 좌표 설정
-	COORD position = { x,y };
-
-	// 커서 이동 함수 
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), position);
-
-}
-
-int map[Max_y][Max_x] = { 0, }; // 2차원 배열 사용
-char* openmap[Max_y][Max_x] = { NULL, };
-
-void CreateMine()
-{
-	srand(time(NULL));
 	int object  = rand();
-	
-	
-	for (int i = 0; i < Max_x; i++)
+	int x, y, mine_cnt,countmine;
+	// mine 정보를 저장할 메모리에 모두 0을 채움
+	memset(map,  0, Max_y * Max_x);
+	// 사용자가 선택하게되는 정보를 저장할 메모리에 모두 0을 채움.
+	memset(checkmap, 0, Max_y * Max_x);
+	 
+	 
+	for (mine_cnt = 0; mine_cnt < MineCount; mine_cnt++)
 	{
-		object = rand()%2;
+		//난수를 사용하여 폭탄이 위치할곳 생성
+		x = object % (Max_x);
+		y = object % (Max_y);
 
-		for (int j = 0; j < Max_y; j++)
-		{	
-			if (i == 0 || i == Max_x-1)
+		if (map[y][x] == 0)
+		{
+			map[y][x] = '※';		//지뢰 설치구간 
+		}
+		else
+		{
+			mine_cnt--;
+		}
+	}
+		for ( y = 0; y < Max_y; y++)
+		{
+			for ( x = 0; x < Max_x; x++)
 			{
-				map[i][j] = j;
-			}
-			else if (j == 0 || j == Max_y-1)
-			{
-				map[i][j] = i;
-			}
-			else
-			{
-				map[i][j] = object;
+				countmine = 0;
+
+				if (map[y][x] == 0)
+				{
+					
+					if ((y - 1) >= 0) //음수 및 0이 나오지 않게 한다.
+					{
+						if ((x - 1) >= 0 && map[y - 1][x - 1] == '※')countmine++;
+						if (map[y - 1][x] == '※')countmine++;
+						if ((x + 1) < Max_x && map[y - 1][x + 1] == '※')countmine++;
+					}
+					if ((x - 1) >= 0 && map[y][x - 1] == '※')countmine++;
+					if ((x + 1) < Max_x  && map[y][x + 1] == '※')countmine++;
+					if ((y + 1) < Max_y )
+					{
+						if ((y + 1) < Max_y)
+						{
+							if ((x - 1) >= 0 && map[y+1][x - 1] == '※')countmine++;
+							if (map[y + 1][x] == '※')countmine++;
+							if ((x + 1) < Max_x && map[y + 1][x + 1] == '※')countmine++;
+						}
+					}
+
+				}
+				map[y][x] = '0' + countmine;
 			}
 		}
-		printf("\n");
-		
-	}
+	
 }
+	
 
-void  HideMap()
+void ShowMap(char map[][Max_x])
 {
-
-	for (int i = 0; i < Max_x; i++)
+	
+	printf("\n");
+	for (int y = 0; y < Max_y; y++)
 	{
-		for (int j = 0; j < Max_y; j++)
+		for ( int x = 0; x < Max_x; x++)
 		{
-			if (i == 0 || i == Max_x-1)
-			{
-				if (j >= 10)
-				{
-					printf(" %d ", map[i][j]);
-				}
-				else
-				{
-					printf(" %d  ", map[i][j]); 
-				}
-			}
-			else if (j == 0 || j == Max_y-1)
-			{
-				if (i >= 10)
-				{
-					printf(" %d ", map[i][j]);
-				}
-				else
-				{
-					printf(" %d  ", map[i][j]);
-				}
-				
-			}
-
+			printf("%c", map[y][x]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+	
+}
+void ShowCurrentMapState(char map[][Max_x], char checkmap[][Max_x])
+{
+	printf("\n");
+	for (int y = 0; y < Max_y; y++)
+	{
+		for (int x = 0; x < Max_x; x++)
+		{
+			if (checkmap[y][x])
+				printf("%c", map[y][x]);
 			else
-			{
 				printf(" □ ");
-			}
-			
-
-			
-		}
-		printf("\n\n");
-	}
-
-}
-void CountMine()
-{
-	
-	for (int x = 0; x < Max_x; x++)
-	{
-		int mine_cnt = 0;
-
-		for (int y = 0; y < Max_y; y++)
-		{
-			if (map[y][x]==0 && y-1>0)
-			{
-				if ((x - 1) > 0 && map[y+1][x - 1] == 1) mine_cnt++; //1
-				if ((x - 1) > 0 && map[y][x - 1] == 1)mine_cnt++;//2
-				if ((x - 1) > 0 && map[y - 1][x - 1] == 1)mine_cnt++;//3
-				if ((y - 1) > 0 && map[y - 1][x] == 1)mine_cnt++;//4
-				if ( (y - 1) > 0 && map[y - 1][x + 1] == 1)mine_cnt++;//5
-				if ((y - 1) > 0 && map[y - 1][x] == 1)mine_cnt++;//6
-				if (map[y + 1][x + 1] == 1)mine_cnt++;//7
-				if (map[y][x + 1] == 1)mine_cnt++; //8 
-
-				
-			}
-		
-			map[y][x] = mine_cnt;
-			printf(" %d ", map[y][x]);
-
 		}
 		printf("\n");
-		
-		
 	}
-	
-		
+	printf("\n");
 }
-
-
-
-
+				
 
 int main()
 { 
+	char map[Max_y][Max_x];
+	char checkmap[Max_y][Max_x];
+
+	srand((unsigned)time(NULL)); 
+	CreateMineTable(map, checkmap);
+	ShowCurrentMapState(map, checkmap);
 	
-	CreateMine();
-	CountMine();
-	
+	int x, y;
 	while (1)
 	{
+		printf("확인할 위치의 x, y좌표를 입력하시오(음수 불가).\n");
+		printf("X좌표 입력 : ");
+		scanf_s("%d", &x);
 		
-	}
 
+		if (x <= 0) break;
+
+		printf("y좌표 입력 : ");
+		scanf_s("%d", &y);
+		if (y <= 0) break;
+
+		if (x < Max_x - 1 && Max_y - 1)
+		{
+			if (checkmap[y][x] == 0)
+			{
+				if (map[y][x] == '※')
+				{
+					printf("지뢰를 선택하였습니다.");
+					break;
+				}
+				else
+				{
+					checkmap[y][x] = 1;
+					
+					ShowCurrentMapState(map, checkmap);
+
+				}
+
+			}
+			else printf("이미 확인된 위치입니다.\n\n");
+		}
+		else printf("잘못된 위치를 선택하였습니다.\n\n");
+	}
 		
+		
+	
+	ShowMap(map);
 	
 	return 0;
 }
+		
+
+
+
+	
+
+
+
+
+	
+	
+
+		
+	
+
+		

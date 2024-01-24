@@ -1,3 +1,2 @@
 ﻿  mine1.c
-C:\Users\Administrator\Desktop\새 폴더\mine\MineGame\MineGame\mine1.c(30,16): warning C4305: '=': truncation from 'int' to 'char'
   MineGame.vcxproj -> C:\Users\Administrator\Desktop\새 폴더\mine\MineGame\x64\Debug\MineGame.exe

@@ -1,16 +1,24 @@
 #define _CRT_SECURE_NO_WARNINGS 
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <memory.h>
+#include <stdlib.h>		// 난수 사용하기 위함 
+#include <time.h>       // time 코드 사용하기 위함 
+#include <memory.h>     //memset 함수를 사용하기 위함 
+#include <windows.h>
 
 #define Max_x 15 // 가로 10
 #define Max_y 15 // 세로 10
 #define MineCount 40 
 
+void textcolor(int color_number)
+{
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color_number);
+}
+
+
+
 
 void CreateMineTable(char map[][Max_x] ,char checkmap[Max_y][Max_x])
-{
+{	
 	
 	int x, y, mine_cnt,countmine;
 	// mine 정보를 저장할 메모리에 모두 0을 채움
@@ -78,28 +86,37 @@ void CreateMineTable(char map[][Max_x] ,char checkmap[Max_y][Max_x])
 }
 	
 
-void ShowMap(char map[][Max_x])
-{
+void ShowMap(char map[][Max_x]) //죽고 나서 지뢰 위치를 알려주는 함수 
+{	
+	textcolor(15);
 	printf("\n\n        <<지뢰 위치>>");
 	printf("\n\n"); //줄바꿈
 	for (int y = 0; y < Max_y; y++)
 	{
+		
 		for ( int x = 0; x < Max_x; x++)
 		{
+			
 			if (map[y][x] == 'a')
 			{
+				textcolor(4);
 				printf("※");
 			}
 			else
 			{
+				textcolor(15);
 				printf("%c ", map[y][x]);
-			}
+				
+			}		
+				
+			
 		}
 		printf("\n");
 	}
 	printf("\n");
 	
-}
+}		
+		
 void ShowCurrentMapState(char map[][Max_x], char checkmap[][Max_x])
 {
 	printf("\n");
@@ -107,15 +124,36 @@ void ShowCurrentMapState(char map[][Max_x], char checkmap[][Max_x])
 	{
 		for (int x = 0; x < Max_x; x++)
 		{
+			
 			if (checkmap[y][x])
-				printf("%c ", map[y][x]);  
-			else
-				printf("□");
+			{	
+				textcolor(15);
+				printf("%c ", map[y][x]);
+			}
+			
+			else 
+			{
+				textcolor(8);
+					printf("■");		
+			}		
+				
+				
+			
 		}
-		printf("\n");
-	}
-	printf("\n");
-}
+		printf("\n");	
+	}	
+	printf("\n");	
+		
+
+}							
+			
+		
+	
+
+				
+	
+	
+		
 				
 
 int main()
@@ -131,53 +169,78 @@ int main()
 	//선택 정보를 반영하여 지뢰 정보 출력
 	ShowCurrentMapState(map, checkmap);
 	
-	int x, y;
+	int x, y, block;
+	block = (Max_y) * (Max_x)-(MineCount); //지뢰 제외 모든 블럭 
+	 
 	while (1)
 	{
+		textcolor(15);
 		printf("확인할 위치의 x, y좌표를 입력하시오(음수 불가).\n"); 
 		printf("X좌표 입력 : ");
 		scanf_s("%d", &x); 
-		
-
 		if (x < 0) break;
 
-		printf("y좌표 입력 : ");
+        printf("y좌표 입력 : ");
 		scanf_s("%d", &y);
 		if (y < 0) break;
-
-		if (x < Max_x  && y < Max_y )
-		{
-			if (checkmap[y][x] == 0)
+		
+		
+		
+			if (x < Max_x && y < Max_y)
 			{
-				//사용자가 폭탄을 선택했을 경우 
-				if (map[y][x] == 'a')
+				if (checkmap[y][x] == 0)
 				{
-					printf("\n\n※※※※지뢰를 선택하였습니다.※※※※");
-					break; //게임 중단 
-				}
-				else
-				{
-					//사용자가 좌표를 선택했음을 설정 
-					checkmap[y][x] = 1;
-					// 선택 정보를 반영하여 지뢰 출력 
-					// □ 문자로 출력 된것은 아직 확인되지 않은 항목 
-					system("cls"); 
-					ShowCurrentMapState(map, checkmap); 
+					//사용자가 폭탄을 선택했을 경우 
+					if (map[y][x] == 'a')
+					{
+
+						break; //게임 중단 
+					}
+					else
+					{
+						//사용자가 좌표를 선택했음을 설정 
+						checkmap[y][x] = 1;
+						block--;
+						// 선택 정보를 반영하여 지뢰 출력 
+						// □ 문자로 출력 된것은 아직 확인되지 않은 항목 
+						system("cls");
+						ShowCurrentMapState(map, checkmap);
+						if (block <= 0)
+						{
+							break;
+						}
+						
+
+					}
 
 				}
-
+				else printf("이미 확인된 위치입니다.\n\n");
 			}
-			else printf("이미 확인된 위치입니다.\n\n"); 
-		}
-		else printf("잘못된 위치를 선택하였습니다.\n\n");
+			else printf("잘못된 위치를 선택하였습니다.\n\n");
+		
 	}
+	if (block <= 0) //승리조건 
+	{
+		system("cls");
+		printf("\n\n      모든지뢰를 찾으셨습니다.");
+	}
+	else //패배 조건 
+	{
+		textcolor(4);
+		system("cls");
 		
-		
-	//전체 설치 정보 확인 
-	ShowMap(map); 
+		printf("\n\n※※※※지뢰를 선택하였습니다.※※※※");
+
+		ShowMap(map); //전체 설치 정보 확인 
+		textcolor(15);
+	}
+	
+	
 	
 	return 0;
 }
+		
+
 		
 
 

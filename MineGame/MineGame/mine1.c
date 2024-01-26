@@ -3,13 +3,13 @@
 #include <stdlib.h>		// 난수 사용하기 위함 
 #include <time.h>       // time 코드 사용하기 위함 
 #include <memory.h>     //memset 함수를 사용하기 위함 
-#include <windows.h>
+#include <windows.h>	//색상변경을 위함 
 
 #define Max_x 15 // 가로 10
 #define Max_y 15 // 세로 10
-#define MineCount 40 
+#define MineCount 40 //지뢰 40개
 
-void textcolor(int color_number)
+void textcolor(int color_number) //색상변경 함수 
 {
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color_number);
 }
@@ -20,7 +20,7 @@ void textcolor(int color_number)
 void CreateMineTable(char map[][Max_x] ,char checkmap[Max_y][Max_x])
 {	
 	
-	int x, y, mine_cnt,countmine;
+	int x, y, mine_cnt, countmine;
 	// mine 정보를 저장할 메모리에 모두 0을 채움
 	memset(map, 0, Max_y * Max_x);
 	// 사용자가 선택하게되는 정보를 저장할 메모리에 모두 0을 채움.
@@ -34,7 +34,7 @@ void CreateMineTable(char map[][Max_x] ,char checkmap[Max_y][Max_x])
 		//난수를 사용하여 폭탄이 위치할곳 생성
 		x = rand() % Max_x;
 		y = rand() % Max_y;
-
+		
 		if (map[y][x] == 0)
 		{
 			map[y][x] = 'a'; //지뢰 설치구간 char 형은 1byte만 받기에 우선 'a'라고 표기 
@@ -49,7 +49,7 @@ void CreateMineTable(char map[][Max_x] ,char checkmap[Max_y][Max_x])
 			
 			for ( x = 0; x < Max_x; x++)
 			{
-				
+			
 				countmine = 0;
 				if (map[y][x] == 0)
 				{
@@ -75,6 +75,7 @@ void CreateMineTable(char map[][Max_x] ,char checkmap[Max_y][Max_x])
 							if ((x + 1) < Max_x && map[y + 1][x + 1] == 'a')countmine++; //8번
 						}
 					}
+				
 					map[y][x] = '0' + countmine; // 정수형 countmine 을 문자형으로 받음
 
 				}
@@ -89,7 +90,7 @@ void CreateMineTable(char map[][Max_x] ,char checkmap[Max_y][Max_x])
 void ShowMap(char map[][Max_x]) //죽고 나서 지뢰 위치를 알려주는 함수 
 {	
 	textcolor(15);
-	printf("\n\n        <<지뢰 위치>>");
+	printf("\n\n   <<남아있는 지뢰 위치>>");
 	printf("\n\n"); //줄바꿈
 	for (int y = 0; y < Max_y; y++)
 	{
@@ -101,6 +102,11 @@ void ShowMap(char map[][Max_x]) //죽고 나서 지뢰 위치를 알려주는 함수
 			{
 				textcolor(4);
 				printf("※");
+			}
+			else if (map[y][x] == 'f')
+			{
+				textcolor(3);
+				printf("▶"); 
 			}
 			else
 			{
@@ -115,47 +121,69 @@ void ShowMap(char map[][Max_x]) //죽고 나서 지뢰 위치를 알려주는 함수
 	}
 	printf("\n");
 	
-}		
+}	
+
 		
-void ShowCurrentMapState(char map[][Max_x], char checkmap[][Max_x])
+void ShowCurrentMapState(int countflag,int countmine,int block,char map[][Max_x], char checkmap[][Max_x]) //사용자가 보게될 함수 
 {
+	
 	printf("\n");
 	for (int y = 0; y < Max_y; y++)
 	{
 		for (int x = 0; x < Max_x; x++)
 		{
 			
-			if (checkmap[y][x])
-			{	
-				textcolor(15);
-				printf("%c ", map[y][x]);
+			if (map[y][x] != 'f')
+			{
+				if (checkmap[y][x])
+				{
+					textcolor(15);
+					printf("%c ", map[y][x]);
+				}
+				else
+				{
+					textcolor(8);
+					printf("■");
+				}
+			}
+			else if (map[y][x] == 'f')
+			{
+				if (checkmap[y][x])
+				{
+					textcolor(3);
+					printf("▶");
+				}
+				else
+				{
+					textcolor(8);
+					printf("■");
+				}
 			}
 			
-			else 
-			{
-				textcolor(8);
-					printf("■");		
-			}		
-				
+			
 				
 			
 		}
-		printf("\n");	
+		printf("\n");
+		
 	}	
+	//현재 폭탄이 있는 개수 , 남은 깃발 개수 UI
 	printf("\n");	
-		
-
-}							
-			
-		
+	textcolor(4);
+	printf("※");
+	textcolor(15);
+	printf(" : %d", countmine);
+	textcolor(3);
+	printf(" ▶");
+	textcolor(15);
+	printf(" : %d", countflag);
+	textcolor(8);
+	printf(" ■");
+	textcolor(15);
+	printf(" : %d\n\n", block);
 	
-
-				
 	
-	
-		
-				
-
+}	
 int main()
 { 
 	// 폭탄이 설치된 정보를 저장하게될 변수 
@@ -165,12 +193,15 @@ int main()
 	//난수 설정 
 	srand((unsigned)time(NULL));  
 	CreateMineTable(map, checkmap);
-	
+	int countflag, countmine;
+	countflag = MineCount;
+	countmine = MineCount;
+	int block = (Max_y) * (Max_x)-(MineCount); //지뢰 제외 모든 블럭 
 	//선택 정보를 반영하여 지뢰 정보 출력
-	ShowCurrentMapState(map, checkmap);
+	ShowCurrentMapState(countflag,countmine,block,map, checkmap);
 	
-	int x, y, block;
-	block = (Max_y) * (Max_x)-(MineCount); //지뢰 제외 모든 블럭 
+	int x, y,flag;
+	
 	 
 	while (1)
 	{
@@ -184,7 +215,37 @@ int main()
 		scanf_s("%d", &y);
 		if (y < 0) break;
 		
+		if (countflag > 0) //깃발 세우기 
+		{
+			printf("깃발을 세우시겠습니까? (YES:1  NO:2)\n");
+			scanf_s("%d", &flag);
+			if (checkmap[y][x] != 1)
+			{
+					if (flag == 1)
+					{
+						if (map[y][x] == 'a')
+						{
+							map[y][x] = 'f';
+							countflag--;
+							countmine--;
+						}
+						else
+						{
+							map[y][x] = 'f';
+							countflag--;
+							
+						}
+					}
+				
+				
+			}
+		}
+		if (countmine <= 0 && countflag <= 0)break; //지뢰 및 깃발이 없어졌을때 승리조건 (2)
 		
+			
+		
+		
+
 		
 			if (x < Max_x && y < Max_y)
 			{
@@ -204,7 +265,8 @@ int main()
 						// 선택 정보를 반영하여 지뢰 출력 
 						// □ 문자로 출력 된것은 아직 확인되지 않은 항목 
 						system("cls");
-						ShowCurrentMapState(map, checkmap);
+						
+						ShowCurrentMapState(countflag,countmine,block,map, checkmap);
 						if (block <= 0)
 						{
 							break;
@@ -219,10 +281,16 @@ int main()
 			else printf("잘못된 위치를 선택하였습니다.\n\n");
 		
 	}
-	if (block <= 0) //승리조건 
+	if (block <= 0) //승리조건 (1): 지뢰를 제외한 모든블럭을 깼을때 
 	{
 		system("cls");
 		printf("\n\n      모든지뢰를 찾으셨습니다.");
+	}
+	else if (countflag <= 0 && countmine <= 0) //승리조건 (2): 지뢰위치에 깃발이 모두 꽂혔을때
+	{
+		system("cls");
+		printf("\n\n      모든지뢰를 찾으셨습니다.");
+		ShowMap(map);
 	}
 	else //패배 조건 
 	{
@@ -231,14 +299,24 @@ int main()
 		
 		printf("\n\n※※※※지뢰를 선택하였습니다.※※※※");
 
-		ShowMap(map); //전체 설치 정보 확인 
+		ShowMap(map); //전체 설치 정보 확인
 		textcolor(15);
 	}
 	
 	
-	
 	return 0;
 }
+	
+	
+		
+	
+
+				
+	
+	
+		
+				
+
 		
 
 		

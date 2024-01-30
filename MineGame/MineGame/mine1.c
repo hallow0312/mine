@@ -1,12 +1,12 @@
 #define _CRT_SECURE_NO_WARNINGS 
 #include <stdio.h>
-#include <stdlib.h>		// 난수 사용하기 위함 
+#include <stdlib.h>		// rand() 함수사용하기 위함 
 #include <time.h>       // time 코드 사용하기 위함 
 #include <memory.h>     //memset 함수를 사용하기 위함 
 #include <windows.h>	//색상변경을 위함 
 
-#define Max_x 15 // 가로 10
-#define Max_y 15 // 세로 10
+#define Max_x 15 // 가로 15
+#define Max_y 15 // 세로 15
 #define MineCount 40 //지뢰 40개
 
 void textcolor(int color_number) //색상변경 함수 
@@ -194,7 +194,7 @@ int main()
 	srand((unsigned)time(NULL));  
 	CreateMineTable(map, checkmap);
 	int countflag, countmine;
-	countflag = MineCount;
+	countflag = MineCount; //지뢰 개수와 같음
 	countmine = MineCount;
 	int block = (Max_y) * (Max_x)-(MineCount); //지뢰 제외 모든 블럭 
 	//선택 정보를 반영하여 지뢰 정보 출력
@@ -262,7 +262,7 @@ int main()
 						//사용자가 좌표를 선택했음을 설정 
 						checkmap[y][x] = 1;
 						block--;
-						// 선택 정보를 반영하여 지뢰 출력 
+						// 선택 정보를 반영하여 블럭 내 정보를 출력
 						// □ 문자로 출력 된것은 아직 확인되지 않은 항목 
 						system("cls");
 						

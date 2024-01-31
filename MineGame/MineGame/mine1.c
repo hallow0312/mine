@@ -51,7 +51,7 @@ void CreateMineTable(char map[][Max_x] ,char checkmap[Max_y][Max_x])
 			{
 			
 				countmine = 0;
-				if (map[y][x] == 0)
+				if (map[y][x] == 0) //지뢰 위치가 아닐때 
 				{
 					//현재 위치 중심으로 폭탄이 몇개 있는지 카운트 
 					// 1 2 3
@@ -223,11 +223,11 @@ int main()
 			{
 					if (flag == 1)
 					{
-						if (map[y][x] == 'a')
+						if (map[y][x] == 'a') //map[y][x]에 지뢰가 있다면 
 						{
 							map[y][x] = 'f';
 							countflag--;
-							countmine--;
+							countmine--;	 // 깃발을 세운위치의 지뢰는 없어짐 
 						}
 						else
 						{
@@ -269,7 +269,7 @@ int main()
 						ShowCurrentMapState(countflag,countmine,block,map, checkmap);
 						if (block <= 0)
 						{
-							break;
+							break;     //승리조건 (1)
 						}
 						
 
